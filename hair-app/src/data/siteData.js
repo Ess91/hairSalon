@@ -120,6 +120,8 @@ export const SERVICE_CATEGORIES = [
   },
 ];
 
+export const ALL_SERVICES = SERVICE_CATEGORIES.flatMap((c) => c.services);
+export const SERVICE_BY_NAME = Object.fromEntries(ALL_SERVICES.map((s) => [s.name, s]));
 
 export const ADDONS = [
   { name: 'Blunt Cut Bob', price: 10, minutes: 30 },
@@ -130,7 +132,28 @@ export const ADDONS = [
   { name: 'Take home curls', price: 10, minutes: 1 },
 ];
 
+export const ADDON_NAMES = ADDONS.map((a) => a.name);
+export const ADDON_BY_NAME = Object.fromEntries(ADDONS.map((a) => [a.name, a]));
 
+// Every service takes a 50% deposit, calculated on the service price PLUS
+// whatever add-ons are selected — recalculated live, never cached.
+export function calcDeposit(serviceName, selectedAddons = []) {
+  if (!serviceName) return 0;
+  const service = SERVICE_BY_NAME[serviceName];
+  const servicePrice = service ? service.price : 0;
+  const addonsTotal = selectedAddons.reduce((sum, name) => sum + (ADDON_BY_NAME[name]?.price || 0), 0);
+  return Math.round((servicePrice + addonsTotal) * 0.5);
+}
+
+export function addonsTotal(selectedAddons = []) {
+  return selectedAddons.reduce((sum, name) => sum + (ADDON_BY_NAME[name]?.price || 0), 0);
+}
+
+export function addonsMinutes(selectedAddons = []) {
+  return selectedAddons.reduce((sum, name) => sum + (ADDON_BY_NAME[name]?.minutes || 0), 0);
+}
+
+// Lookbook entries. 
 export const INITIAL_LOOKS = [
   {
     image: 'images/look-curly-flipover.svg',
